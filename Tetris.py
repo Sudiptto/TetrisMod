@@ -1,5 +1,5 @@
 import random
-import pygame
+import pygame # import library
 
 """
 10 x 20 grid
