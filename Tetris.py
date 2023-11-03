@@ -282,21 +282,26 @@ def clear_rows(grid, locked):
     return increment
 
 
-# draws the upcoming piece
+# draws the upcoming piece to the left of the screen 
+
+# NOTE FOR ANDY AND SAMANTHA - can delete the draw_next_shape and it will remove the 'next shape' feauture that is shown on the right of the screen, could be used to make more space for the split screen feature 
 def draw_next_shape(piece, surface):
-    font = pygame.font.Font(fontpath, 30)
+    font = pygame.font.Font(fontpath, 30) # set font 
     label = font.render('Next shape', 1, (255, 255, 255))
 
     start_x = top_left_x + play_width + 50
     start_y = top_left_y + (play_height / 2 - 100)
 
-    shape_format = piece.shape[piece.rotation % len(piece.shape)]
+    shape_format = piece.shape[piece.rotation % len(piece.shape)] # note the piece.rotation uses the built in library function of pygame
 
+    # Loop through the rows and columns of the shape format
     for i, line in enumerate(shape_format):
         row = list(line)
         for j, column in enumerate(row):
             if column == '0':
+                # the draw rect is used to draw rectang;es
                 pygame.draw.rect(surface, piece.color, (start_x + j*block_size, start_y + i*block_size, block_size, block_size), 0)
+                # piece.color - random 
 
     surface.blit(label, (start_x, start_y - 30))
 
@@ -304,12 +309,14 @@ def draw_next_shape(piece, surface):
 
 
 # draws the content of the window
+# Renders everything on-to the window 
 def draw_window(surface, grid, score=0, last_score=0):
     surface.fill((0, 0, 0))  # fill the surface with black
 
     pygame.font.init()  # initialise font
     font = pygame.font.Font(fontpath_mario, 65)
     font.set_bold(True)
+    # NOTE: For group we can change the title with this 
     label = font.render('TETRIS', 1, (255, 255, 255))  # initialise 'Tetris' text with white
 
     surface.blit(label, ((top_left_x + play_width / 2) - (label.get_width() / 2), 30))  # put surface on the center of the window
@@ -329,7 +336,7 @@ def draw_window(surface, grid, score=0, last_score=0):
     start_x_hi = top_left_x - 240
     start_y_hi = top_left_y + 200
 
-    surface.blit(label_hi, (start_x_hi + 20, start_y_hi + 200))
+    surface.blit(label_hi, (start_x_hi + 20, start_y_hi + 200)) # NOTE: put the HIGHSCORE POSITION in the bottom place
 
     # draw content of the grid
     for i in range(row):
@@ -337,8 +344,12 @@ def draw_window(surface, grid, score=0, last_score=0):
             # pygame.draw.rect()
             # draw a rectangle shape
             # rect(Surface, color, Rect, width=0) -> Rect
+
+            # Use pygame.draw.rect to draw each block on the grid.
             pygame.draw.rect(surface, grid[i][j],
                              (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
+            
+            # NOTE: To clarify for the code above, this only draws the GRID, but not the actual shapes
 
     # draw vertical and horizontal grid lines
     draw_grid(surface)
