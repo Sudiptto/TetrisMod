@@ -19,23 +19,23 @@ pygame.font.init()
 
 # global variables
 
-col = 10  # 10 columns
+col = 50  # 10 columns
 row = 20  # 20 rows
-s_width = 800  # window width
-s_height = 750  # window height
-play_width = 300  # play window width; 300/10 = 30 width per block
-play_height = 600  # play window height; 600/20 = 20 height per block
+s_width = 800  # window width                                           < NOTE to Group: Create variable that changes depending on gamemode(Teammode, difficulty ect)
+s_height = 750  # window height                                         <
+play_width = 300  # play window width; 300/10 = 30 width per block      <
+play_height = 600  # play window height; 600/20 = 20 height per block   <
 block_size = 30  # size of block
 
-top_left_x = (s_width - play_width) // 2
-top_left_y = s_height - play_height - 50
+top_left_x = (s_width - play_width) // 2 #Splits main screen to create tetris display
+top_left_y = s_height - play_height - 50 # ^^^
 
 filepath = './highscore.txt'
 fontpath = './arcade.ttf'
 fontpath_mario = './mario.ttf'
 
 # shapes formats
-
+# NOTE to Group we can add different shapes but ensure to add them to shapes and shape_color
 S = [['.....',
       '.....',
       '..00.',
@@ -140,7 +140,7 @@ T = [['.....',
 
 # index represents the shape
 shapes = [S, Z, I, O, J, L, T]
-shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
+shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)] #We can add a function that changes these colors to fit a certain theme depending on the level
 
 
 # class to represent each of the pieces
@@ -158,7 +158,7 @@ class Piece(object):
 # initialise the grid
 def create_grid(locked_pos={}):
     grid = [[(0, 0, 0) for x in range(col)] for y in range(row)]  # grid represented rgb tuples
-
+    #       ^^NOTE FOR GROUP TO CHANGE COLOR Have same value as on line 259, still not sure what else to change
     # locked_positions dictionary
     # (x,y):(r,g,b)
     for y in range(row):
