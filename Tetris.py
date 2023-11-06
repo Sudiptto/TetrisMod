@@ -1,5 +1,5 @@
-import random
-import pygame
+import random, pygame
+from pygame.locals import *
 
 """
 10 x 20 grid
@@ -450,6 +450,10 @@ def main(window):
                     current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
                     if not valid_space(current_piece, grid):
                         current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+                        
+                elif event.key == K_ESCAPE:
+                    pygame.display.quit()
+                    quit()
 
         piece_pos = convert_shape_format(current_piece)
 
@@ -495,8 +499,12 @@ def main_menu(window):
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.KEYDOWN:
-                main(window)
-
+                if event.key == K_ESCAPE:
+                    pygame.display.quit()
+                    quit()
+                else:
+                    main(window)
+                
     pygame.quit()
 
 
