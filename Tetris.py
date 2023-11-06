@@ -160,6 +160,7 @@ def create_grid(locked_pos={}):
     grid = [[(0, 0, 0) for x in range(col)] for y in range(row)]  # grid represented rgb tuples
     #       ^^NOTE FOR GROUP TO CHANGE COLOR Have same value as on line 259, still not sure what else to change
     # locked_positions dictionary
+    #test comment
     # (x,y):(r,g,b)
     for y in range(row):
         for x in range(col):
