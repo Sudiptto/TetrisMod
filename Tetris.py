@@ -19,7 +19,7 @@ pygame.font.init()
 
 # global variables
 
-col = 50  # 10 columns
+col = 10  # 10 columns
 row = 20  # 20 rows
 s_width = 800  # window width                                           < NOTE to Group: Create variable that changes depending on gamemode(Teammode, difficulty ect)
 s_height = 750  # window height                                         <
