@@ -17,6 +17,24 @@ tetriminos:
 
 pygame.font.init()
 
+# MUSIC FROM: https://pixabay.com/music/search/brazil/
+# NOTE FOR TEAM ADDING MUSIC! (BATTLE THEME ) REFER TO GITHUB COMMIT FOR MORE INFORMATION
+# Starting the mixer 
+pygame.mixer.init()
+  
+# Loading the song 
+pygame.mixer.music.load("brazilmusic.mp3") 
+pygame.mixer.music.play(loops=-1) # keep the loop going 
+# Setting the volume  
+pygame.mixer.music.set_volume(0.7) 
+
+# Start playing the song 
+#mixer.music.play() 
+
+# SOUND FROM HERE: https://pixabay.com/sound-effects/search/cheers/ (yay by Pixabay)
+yay_sound = pygame.mixer.Sound("yay.mp3")
+yay_sound.set_volume(0.5)
+
 # global variables
 
 col = 10  # 10 columns
@@ -272,6 +290,7 @@ def clear_rows(grid, locked):
     # add another empty row on the top
     # move down one step
     if increment > 0:
+        pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
         # sort the locked list according to y value in (x,y) and then reverse
         # reversed because otherwise the ones on the top will overwrite the lower ones
         for key in sorted(list(locked), key=lambda a: a[1])[::-1]:
@@ -395,7 +414,7 @@ def main(window):
     fall_speed = 0.35
     level_time = 0
     score = 0
-    last_score = get_max_score()
+    last_score = get_max_score() 
 
     while run:
         # need to constantly make new grid as locked positions always change
@@ -471,11 +490,24 @@ def main(window):
             current_piece = next_piece
             next_piece = get_shape()
             change_piece = False
+            # CODE NEEDED TO ADD POINTS (WHEN USER CLEARS ROW)
             score += clear_rows(grid, locked_positions) * 10    # increment score by 10 for every row cleared
             update_score(score)
 
+            # NOTE FOR GROUP: THIS IS WHEN THE CURRENT SCORE THE USER GETS BEATS THE HISTORIC SCORE OF ALL TIME (WE CAN PERHAPS DO SOMETHING SPECIAL FOR THIS )
             if last_score < score:
-                last_score = score
+                pass
+                    # Loading the song 
+                #mixer.music.load("yay.mp3") 
+                #yay_sound.play()
+                #pygame.mixer.Channel(1).play(yay_sound)  
+   
+                #last_score = score
+                # Setting the volume 
+                #mixer.music.set_volume(0.5) 
+
+                #mixer.music.play(-1)
+                #last_score = score
 
         draw_window(window, grid, score, last_score)
         draw_next_shape(next_piece, window)
@@ -495,7 +527,6 @@ def main_menu(window):
     while run:
         draw_text_middle('Press any key to begin', 50, (255, 255, 255), window)
         pygame.display.update()
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
