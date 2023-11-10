@@ -39,13 +39,13 @@ yay_sound.set_volume(0.5)
 
 col = 10  # 10 columns
 row = 20  # 20 rows
-s_width = 800  # window width                                           < NOTE to Group: Create variable that changes depending on gamemode(Teammode, difficulty ect)
-s_height = 750  # window height                                         <
+s_width = 1500  # window width                                           < NOTE to Group: Create variable that changes depending on gamemode(Teammode, difficulty ect)
+s_height = 850  # window height                                         <
 play_width = 300  # play window width; 300/10 = 30 width per block      <
 play_height = 600  # play window height; 600/20 = 20 height per block   <
 block_size = 30  # size of block
 
-top_left_x = (s_width - play_width) // 2 #Splits main screen to create tetris display
+top_left_x = (s_width - play_width) // 4 #Splits main screen to create tetris display - Normally its devided by 2
 top_left_y = s_height - play_height - 50 # ^^^
 
 filepath = './highscore.txt'
@@ -466,6 +466,27 @@ def main(window):
                         current_piece.y -= 1
 
                 elif event.key == pygame.K_w:
+                    # rotate shape
+                    current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
+                    if not valid_space(current_piece, grid):
+                        current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+                if event.key == pygame.K_LEFT:
+                    current_piece.x -= 1  # move x position left
+                    if not valid_space(current_piece, grid):
+                        current_piece.x += 1
+
+                elif event.key == pygame.K_RIGHT:
+                    current_piece.x += 1  # move x position right
+                    if not valid_space(current_piece, grid):
+                        current_piece.x -= 1
+
+                elif event.key == pygame.K_DOWN:
+                    # move shape down
+                    current_piece.y += 1
+                    if not valid_space(current_piece, grid):
+                        current_piece.y -= 1
+
+                elif event.key == pygame.K_UP:
                     # rotate shape
                     current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
                     if not valid_space(current_piece, grid):
