@@ -415,15 +415,33 @@ def main(window):
     level_time = 0
     score = 0
     last_score = get_max_score() 
+    
+    #Player 2 Variables in the following
+    locked_positions_2 = {}
+    create_grid(locked_positions_2)
+
+    change_piece_2 = False
+    run_2 = True
+    current_piece_2 = get_shape()
+    next_piece_2 = get_shape()
+    clock_2 = pygame.time.Clock()
+    fall_time_2 = 0
+    fall_speed_2 = 0.35
+    level_time_2 = 0
+    score_2 = 0
+    last_score_2 = get_max_score() 
 
     while run:
         # need to constantly make new grid as locked positions always change
         grid = create_grid(locked_positions)
-
+        grid_2 = create_grid(locked_positions)
         # helps run the same on every computer
         # add time since last tick() to fall_time
         fall_time += clock.get_rawtime()  # returns in milliseconds
         level_time += clock.get_rawtime()
+        
+        fall_time_2 += clock.get_rawtime()  # returns in milliseconds of player 2
+        level_time_2 += clock.get_rawtime()
 
         clock.tick()  # updates clock
 
@@ -431,6 +449,11 @@ def main(window):
             level_time = 0
             if fall_speed > 0.15:   # until fall speed is 0.15
                 fall_speed -= 0.005
+                
+        if level_time_2/1000 > 5:    # make the difficulty harder every 10 seconds for player 2
+            level_time_2 = 0
+            if fall_speed_2 > 0.15:   # until fall speed is 0.15 for player 2
+                fall_speed_2 -= 0.005
 
         if fall_time / 1000 > fall_speed:
             fall_time = 0
@@ -441,6 +464,16 @@ def main(window):
                 # need to lock the piece position
                 # need to generate new piece
                 change_piece = True
+                
+            if fall_time_2 / 1000 > fall_speed: #For player 2
+                fall_time_2 = 0
+                current_piece_2.y += 1
+                if not valid_space(current_piece_2, grid_2) and current_piece_2.y > 0:
+                    current_piece_2.y -= 1
+                    # since only checking for down - either reached bottom or hit another piece
+                    # need to lock the piece position
+                    # need to generate new piece
+                    change_piece_2 = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -451,25 +484,28 @@ def main(window):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
                     current_piece.x -= 1  # move x position left
-                    if not valid_space(current_piece, grid):
+                    if not valid_space(current_piece_2, grid_2):
                         current_piece.x += 1
 
                 elif event.key == pygame.K_d:
                     current_piece.x += 1  # move x position right
-                    if not valid_space(current_piece, grid):
+                    if not valid_space(current_piece_2, grid_2):
                         current_piece.x -= 1
 
                 elif event.key == pygame.K_s:
                     # move shape down
                     current_piece.y += 1
-                    if not valid_space(current_piece, grid):
+                    if not valid_space(current_piece_2, grid_2):
                         current_piece.y -= 1
 
                 elif event.key == pygame.K_w:
                     # rotate shape
-                    current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
-                    if not valid_space(current_piece, grid):
-                        current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+                    current_piece_2.rotation = current_piece_2.rotation + 1 % len(current_piece_2.shape)
+                    if not valid_space(current_piece_2, grid_2):
+                        current_piece_2.rotation = current_piece_2.rotation - 1 % len(current_piece_2.shape)
+                
+                #FOLLOWING INPUTS FOR PLAYER 1 from line 508
+                        
                 if event.key == pygame.K_LEFT:
                     current_piece.x -= 1  # move x position left
                     if not valid_space(current_piece, grid):
