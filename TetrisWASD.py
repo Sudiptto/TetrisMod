@@ -545,3 +545,4 @@ if __name__ == '__main__':
     pygame.display.set_caption('Tetris')
 
     main_menu(win)  # start game
+
