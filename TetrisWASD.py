@@ -16,7 +16,7 @@ tetriminos:
 """
 
 pygame.font.init()
-
+#Line 615, 203 - 209, 265
 # MUSIC FROM: https://pixabay.com/music/search/brazil/
 # NOTE FOR TEAM ADDING MUSIC! (BATTLE THEME ) REFER TO GITHUB COMMIT FOR MORE INFORMATION
 # Starting the mixer 
@@ -173,18 +173,21 @@ class Piece(object):
         if piece_num == 1:
             self.x = x
             self.y = y
+            self.shape = shape
+            self.color = shape_colors[shapes.index(shape)]  # choose color from the shape_color list
+            self.rotation = 0  # chooses the rotation according to index
         elif piece_num == 2:
             self.x_2 = x
             self.y_2 = y
-        self.shape = shape
-        self.color = shape_colors[shapes.index(shape)]  # choose color from the shape_color list
-        self.rotation = 0  # chooses the rotation according to index
+            self.shape = shape
+            self.color = shape_colors[shapes.index(shape)]  # choose color from the shape_color list
+            self.rotation = 0  # chooses the rotation according to index
 
 
 # initialise the grid
 def create_grid(locked_pos={},locked_pos_2={}):
-    grid = 0
-    grid_2 = 0
+    grid = {}
+    grid_2 = {}
     if locked_pos_2 == 0:
         grid = [[(0, 0, 0) for x in range(col)] for y in range(row)]  # grid represented rgb tuples
         #       ^^NOTE FOR GROUP TO CHANGE COLOR Have same value as on line 259, still not sure what else to change
@@ -196,24 +199,20 @@ def create_grid(locked_pos={},locked_pos_2={}):
                     color = locked_pos[
                         (x, y)]  # get the value color (r,g,b) from the locked_positions dictionary using key (x,y)
                     grid[y][x] = color  # set grid position to color
-
     if locked_pos == 0:
-        grid_2 = [[(0, 0, 0) for x_2 in range(col_2)] for y_2 in range(row_2)]  # grid represented rgb tuples
+        grid_2 = [[(0, 0, 0) for x_2 in range(col_2+10,40)] for y_2 in range(row_2)]  # grid represented rgb tuples
         for y_2 in range(row_2):
-            for x_2 in range(col_2):
+            for x_2 in range(col_2+10,40):
                 if (x_2, y_2) in locked_pos_2:
                     color = locked_pos_2[
                         (x_2, y_2)]  # get the value color (r,g,b) from the locked_positions dictionary using key (x,y)
-                    grid_2[y_2][x_2] = color  # set grid position to color
+                    grid_2[y_2][x_2-20] = color  # set grid position to color
 
-            
     return (grid, grid_2)
 
 def convert_shape_format(piece, place):
     positions = []
     positions_2 = []
-    shape_format = piece.shape[piece.rotation % len(piece.shape)]  # get the desired rotated shape from piece
-    shape_format_2 = piece.shape[piece.rotation % len(piece.shape)]
 
     '''
     e.g.
@@ -224,26 +223,26 @@ def convert_shape_format(piece, place):
         '.....']
     '''
     if place == 1:
+        shape_format = piece.shape[piece.rotation % len(piece.shape)] 
         for i, line in enumerate(shape_format):  # i gives index; line gives string
             row = list(line)  # makes a list of char from string
             for j, column in enumerate(row):  # j gives index of char; column gives char
                 if column == '0':
                     positions.append((piece.x + j, piece.y + i))
-
         for i, pos in enumerate(positions):
             positions[i] = (pos[0] - 2, pos[1] - 4)  # offset according to the input given with dot and zero
-
         return positions
     
     elif place == 2:
+        shape_format_2 = piece.shape[piece.rotation % len(piece.shape)]
         for i, line in enumerate(shape_format_2):  # i gives index; line gives string
-            row_2 = list(line)  # makes a list of char from string
-            for j, column in enumerate(row_2):  # j gives index of char; column gives char
+            row_2 = list(line)  # makes a list of chart from string
+            for j, column in enumerate(row_2):  # j gives index of chart; column gives chart
                 if column == '0':
                     positions_2.append((piece.x_2 + j, piece.y_2 + i))
 
-        for i, pos in enumerate(positions_2):
-            positions_2[i] = (pos[0] - 2, pos[1] - 4)  # offset according to the input given with dot and zero
+        for i, pos2 in enumerate(positions_2):
+            positions_2[i] = (pos2[0] - 4, pos2[1] - 4)  # offset according to the input given with dot and zero, CHANGE pos[0] FOR X AXIS PIECE
 
         return positions_2
 
@@ -261,34 +260,41 @@ def valid_space(piece, grid, player):
                 if pos[1] >= 0:
                     return False
         return True
-    if player == 2:
-        accepted_pos_2 = [[(x_2, y_2) for x_2 in range(col_2) if grid[y_2][x_2] == (0, 0, 0)] for y_2 in range(row_2)]
+    elif player == 2:
+        accepted_pos_2 = [[(x_2 + 20, y_2) for x_2 in range(20) if grid[y_2][x_2] == (0, 0, 0)] for y_2 in range(row_2)]
         accepted_pos_2 = [x_2 for item_2 in accepted_pos_2 for x_2 in item_2]
+        print(accepted_pos_2)
         formatted_shape_2 = convert_shape_format(piece, 2)
-        for pos in formatted_shape_2:
-            if pos not in accepted_pos_2:
-                if pos[1] >= 0:
+        for pos_2 in formatted_shape_2:
+            if pos_2 not in accepted_pos_2:
+                if pos_2[1] >= 0:
                     return False
         return True
 
 
 # check if piece is out of board
-def check_lost(positions):
-    for pos in positions:
-        x, y = pos
-        if y < 1:
-            return True
-    return False
-
+def check_lost(positions, num1):
+    if num1 == 1:
+        for pos in positions:
+            x, y = pos
+            if y < 1:
+                return True
+        return False
+    if num1 == 2:
+        for pos_2 in positions:
+            x_2, y_2 = pos_2
+            if y_2 < 1:
+                return True
+        return False
 
 # chooses a shape randomly from shapes list, changes the x and y of where the shape appears
 def get_shape(grid):
     global piece_num
     piece_num = grid
-    if grid == 1:
+    if piece_num == 1:
         return Piece(4, 0, random.choice(shapes))
-    elif grid == 2:
-        return Piece(5, 0, random.choice(shapes))
+    elif piece_num == 2:
+        return Piece(30, 0, random.choice(shapes))
 
 
 # draws text in the middle
@@ -321,7 +327,7 @@ def draw_grid(surface):
 
 
 # clear a row when it is filled
-def clear_rows(grid, locked):
+def clear_rows(grid, locked, num):
     # need to check if row is clear then shift every other row above down one
     increment = 0
     for i in range(len(grid) - 1, -1, -1):      # start checking the grid backwards
@@ -340,18 +346,28 @@ def clear_rows(grid, locked):
     # delete filled bottom row
     # add another empty row on the top
     # move down one step
-    if increment > 0:
-        pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
-        # sort the locked list according to y value in (x,y) and then reverse
-        # reversed because otherwise the ones on the top will overwrite the lower ones
-        for key in sorted(list(locked), key=lambda a: a[1])[::-1]:
-            x, y = key
-            if y < index:                       # if the y value is above the removed index
-                new_key = (x, y + increment)    # shift position to down
-                locked[new_key] = locked.pop(key)
-
-    return increment
-
+    if num == 1:
+        if increment > 0:
+            pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
+            # sort the locked list according to y value in (x,y) and then reverse
+            # reversed because otherwise the ones on the top will overwrite the lower ones
+            for key in sorted(list(locked), key=lambda a: a[1])[::-1]:
+                x, y = key
+                if y < index:                       # if the y value is above the removed index
+                    new_key = (x, y + increment)    # shift position to down
+                    locked[new_key] = locked.pop(key)
+        return increment
+    elif num == 2:
+        if increment > 0:
+            pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
+            # sort the locked list according to y value in (x,y) and then reverse
+            # reversed because otherwise the ones on the top will overwrite the lower ones
+            for key in sorted(list(locked), key=lambda a: a[1])[::-1]:
+                x_2, y_2 = key
+                if y_2 < index:                       # if the y value is above the removed index
+                    new_key_2 = (x_2, y_2 + increment)    # shift position to down
+                    locked[new_key_2] = locked.pop(key)
+        return increment
 
 # draws the upcoming piece to the left of the screen 
 
@@ -434,7 +450,7 @@ def draw_window(surface, grid, score=0, last_score=0):
     # draw rectangular border around play area
     border_color = (255, 255, 255)
     pygame.draw.rect(surface, border_color, (top_left_x, top_left_y, play_width, play_height), 4)
-    pygame.draw.rect(surface, border_color, (top_left_x*3, top_left_y, play_width, play_height), 4)
+    pygame.draw.rect(surface, border_color, ((top_left_x*3), top_left_y, play_width, play_height), 4)
 
 # update the score txt file with high score
 def update_score(new_score):
@@ -598,7 +614,8 @@ def main(window):
         for i_2 in range(len(piece_pos_2)):
             x_2, y_2 = piece_pos_2[i_2]
             if y_2 >= 0:
-                grid_2[y_2][x_2] = current_piece_2.color
+                grid_2[y_2][x_2-20] = current_piece_2.color
+
                 
         if change_piece:  # if the piece is locked
             for pos in piece_pos:
@@ -608,7 +625,7 @@ def main(window):
             next_piece = get_shape(1)
             change_piece = False
             # CODE NEEDED TO ADD POINTS (WHEN USER CLEARS ROW)
-            score += clear_rows(grid, locked_positions) * 10    # increment score by 10 for every row cleared
+            score += clear_rows(grid, locked_positions, 1) * 10    # increment score by 10 for every row cleared
             update_score(score)
             
         if change_piece_2:  # if the piece is locked
@@ -619,7 +636,7 @@ def main(window):
             next_piece_2 = get_shape(2)
             change_piece_2 = False
             # CODE NEEDED TO ADD POINTS (WHEN USER CLEARS ROW)
-            score += clear_rows(grid_2, locked_positions_2) * 10    # increment score by 10 for every row cleared
+            score += clear_rows(grid_2, locked_positions_2, 2) * 10    # increment score by 10 for every row cleared
             update_score(score_2)
 
             # NOTE FOR GROUP: THIS IS WHEN THE CURRENT SCORE THE USER GETS BEATS THE HISTORIC SCORE OF ALL TIME (WE CAN PERHAPS DO SOMETHING SPECIAL FOR THIS )
@@ -638,15 +655,14 @@ def main(window):
 
                 #mixer.music.play(-1)
                 #last_score = score
-        draw_window(window, grid, score, last_score)
-        draw_next_shape(next_piece, window)
-        
         draw_window(window, grid_2, score, last_score)
         draw_next_shape(next_piece_2, window)
+        
+
         pygame.display.update()
-        if check_lost(locked_positions):
+        if check_lost(locked_positions, 1):
             run = False
-        if check_lost(locked_positions_2):
+        if check_lost(locked_positions_2, 2):
             run_2 = False
 
     draw_text_middle('You Lost', 40, (255, 255, 255), window)
