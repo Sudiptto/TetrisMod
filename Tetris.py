@@ -33,7 +33,13 @@ pygame.mixer.music.set_volume(0.7)
 
 # SOUND FROM HERE: https://pixabay.com/sound-effects/search/cheers/ (yay by Pixabay)
 yay_sound = pygame.mixer.Sound("yay.mp3")
-yay_sound.set_volume(0.5)
+yay_sound.set_volume(0.3)
+
+level1 = pygame.mixer.Sound("level1.mp3")
+level1.set_volume(0.7)
+
+level2 = pygame.mixer.Sound("level2.mp3")
+level2.set_volume(0.9)
 
 # global variables
 
@@ -155,6 +161,7 @@ T = [['.....',
       '.00..',
       '..0..',
       '.....']]
+
 
 # index represents the shape
 shapes = [S, Z, I, O, J, L, T]
@@ -293,6 +300,7 @@ def clear_rows(grid, locked):
         pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
         # sort the locked list according to y value in (x,y) and then reverse
         # reversed because otherwise the ones on the top will overwrite the lower ones
+        win.fill((0,0,255))
         for key in sorted(list(locked), key=lambda a: a[1])[::-1]:
             x, y = key
             if y < index:                       # if the y value is above the removed index
@@ -331,8 +339,17 @@ def draw_next_shape(piece, surface):
 # draws the content of the window
 # Renders everything on-to the window 
 def draw_window(surface, grid, score=0, last_score=0):
+    
     surface.fill((0, 0, 0))  # fill the surface with black
-
+    #NOTE FOR SUDIPTTO (ME) - ADD MORE LEVELS, THIS IS WHERE YOU CAN CHANGE THE SCREEN COLOR 
+    if (score >= 20  and score < 40):
+        surface.fill((100, 100, 100)) # fill the surface with grey 
+    elif (score >= 40  and score < 60):
+        surface.fill((50, 100, 50)) # fill the surface with green
+    # NOTE FOR SUDIPTTO - TEST LEVEL 3 ANOTHER TIME AND VERIFY COLOR + IF IT WORKS 
+    elif (score >= 60  and score < 80):
+        surface.fill((100, 50, 50)) # fill the surface with gre
+   
     pygame.font.init()  # initialise font
     font = pygame.font.Font(fontpath_mario, 65)
     font.set_bold(True)
@@ -413,6 +430,7 @@ def main(window):
     fall_time = 0
     fall_speed = 0.35
     level_time = 0
+    factor = 0
     score = 0
     last_score = get_max_score() 
 
@@ -427,6 +445,7 @@ def main(window):
 
         clock.tick()  # updates clock
 
+        # NOTE FOR GROUP: COULD MAKE THE LEVEL HARDER, SO INSTEAD OF EVERY 10 SECONDS WE CAN MAKE THE FALL TIME BASED ON THE LEVEL
         if level_time/1000 > 5:    # make the difficulty harder every 10 seconds
             level_time = 0
             if fall_speed > 0.15:   # until fall speed is 0.15
@@ -495,19 +514,39 @@ def main(window):
             update_score(score)
 
             # NOTE FOR GROUP: THIS IS WHEN THE CURRENT SCORE THE USER GETS BEATS THE HISTORIC SCORE OF ALL TIME (WE CAN PERHAPS DO SOMETHING SPECIAL FOR THIS )
-            if last_score < score:
-                pass
-                    # Loading the song 
-                #mixer.music.load("yay.mp3") 
-                #yay_sound.play()
-                #pygame.mixer.Channel(1).play(yay_sound)  
-   
-                #last_score = score
-                # Setting the volume 
-                #mixer.music.set_volume(0.5) 
+            #factor = 0
+            # NOTE FOR SUDIPTTO: FINISH LEVEL SYSTEM
+            if (score >= 20  and score < 40) and factor == 0:
+                pygame.mixer.Channel(2).play(level1)
+                # PAUSE THE SCREEN AND DISPLAY LEVEL ONE! 
+                #surface.fill((255, 255, 255))
+                draw_text_middle('LEVEL ONE :)', 40, (255, 255, 255), window)
+                pygame.display.update()
+                pygame.time.delay(2000) 
 
-                #mixer.music.play(-1)
-                #last_score = score
+                factor += 1
+
+            # as of recent testing it looks like it works
+            elif (score >= 40  and score < 60) and factor == 1:
+                pygame.mixer.Channel(3).play(level2) # NOTE CHANGE TO LEVEL 2 NOT LEVEL 1 AUDIO
+                # PAUSE THE SCREEN AND DISPLAY LEVEL ONE! 
+                draw_text_middle('LEVEL TWO :)', 40, (255, 255, 255), window)
+                pygame.display.update()
+                pygame.time.delay(2000) 
+
+                factor += 1
+            
+            # as of recent testing it looks like it works
+            elif (score >= 60  and score < 80) and factor == 2:
+                pygame.mixer.Channel(3).play(level2) # NOTE CHANGE TO LEVEL 2 NOT LEVEL 1 AUDIO
+                # PAUSE THE SCREEN AND DISPLAY LEVEL ONE! 
+                # NOTE FOR SUDIPTTO ADD LEVEL 3 AUDIO
+                draw_text_middle('LEVEL THREE :)', 40, (255, 255, 255), window)
+                pygame.display.update()
+                pygame.time.delay(2000) 
+
+                factor += 1
+                    
 
         draw_window(window, grid, score, last_score)
         draw_next_shape(next_piece, window)
@@ -515,7 +554,7 @@ def main(window):
 
         if check_lost(locked_positions):
             run = False
-
+    print(factor) # check if value is being added , printed out one which is good! - did not reset 
     draw_text_middle('You Lost', 40, (255, 255, 255), window)
     pygame.display.update()
     pygame.time.delay(2000)  # wait for 2 seconds
@@ -530,18 +569,20 @@ def main_menu(window):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                
             elif event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:
                     pygame.display.quit()
                     quit()
                 else:
                     main(window)
-                
+          
     pygame.quit()
 
 
 if __name__ == '__main__':
     win = pygame.display.set_mode((s_width, s_height))
+    
     pygame.display.set_caption('Tetris')
 
     main_menu(win)  # start game
