@@ -41,6 +41,9 @@ level1.set_volume(0.7)
 level2 = pygame.mixer.Sound("level2.mp3")
 level2.set_volume(0.9)
 
+level3 = pygame.mixer.Sound("level3.mp3")
+level3.set_volume(0.9)
+
 # global variables
 
 col = 10  # 10 columns
@@ -538,7 +541,7 @@ def main(window):
             
             # as of recent testing it looks like it works
             elif (score >= 60  and score < 80) and factor == 2:
-                pygame.mixer.Channel(3).play(level2) # NOTE CHANGE TO LEVEL 2 NOT LEVEL 1 AUDIO
+                pygame.mixer.Channel(4).play(level3) # NOTE CHANGE TO LEVEL 2 NOT LEVEL 1 AUDIO
                 # PAUSE THE SCREEN AND DISPLAY LEVEL ONE! 
                 # NOTE FOR SUDIPTTO ADD LEVEL 3 AUDIO
                 draw_text_middle('LEVEL THREE :)', 40, (255, 255, 255), window)
