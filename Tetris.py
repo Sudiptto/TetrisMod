@@ -388,6 +388,7 @@ def update_score(new_score):
     with open(filepath, 'w') as file:
         if new_score > score:
             file.write(str(new_score))
+            
         else:
             file.write(str(score))
 

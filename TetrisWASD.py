@@ -1,6 +1,7 @@
 import random, pygame
 from pygame.locals import *
 
+#CANT FIGURE OUT TEAM MODE
 """
 10 x 20 grid
 play_height = 2 * play_width
@@ -199,7 +200,7 @@ def create_grid(locked_pos={},locked_pos_2={}):
                     color = locked_pos[
                         (x, y)]  # get the value color (r,g,b) from the locked_positions dictionary using key (x,y)
                     grid[y][x] = color  # set grid position to color
-    if locked_pos == 0:
+    elif locked_pos == 0:
         grid_2 = [[(0, 0, 0) for x_2 in range(col_2+10,40)] for y_2 in range(row_2)]  # grid represented rgb tuples
         for y_2 in range(row_2):
             for x_2 in range(col_2+10,40):
@@ -207,7 +208,7 @@ def create_grid(locked_pos={},locked_pos_2={}):
                     color = locked_pos_2[
                         (x_2, y_2)]  # get the value color (r,g,b) from the locked_positions dictionary using key (x,y)
                     grid_2[y_2][x_2-20] = color  # set grid position to color
-
+        print(grid_2)
     return (grid, grid_2)
 
 def convert_shape_format(piece, place):
@@ -243,9 +244,8 @@ def convert_shape_format(piece, place):
 
         for i, pos2 in enumerate(positions_2):
             positions_2[i] = (pos2[0] - 4, pos2[1] - 4)  # offset according to the input given with dot and zero, CHANGE pos[0] FOR X AXIS PIECE
-
+            
         return positions_2
-
 
 # checks if current position of piece in grid is valid
 def valid_space(piece, grid, player):
@@ -263,14 +263,12 @@ def valid_space(piece, grid, player):
     elif player == 2:
         accepted_pos_2 = [[(x_2 + 20, y_2) for x_2 in range(20) if grid[y_2][x_2] == (0, 0, 0)] for y_2 in range(row_2)]
         accepted_pos_2 = [x_2 for item_2 in accepted_pos_2 for x_2 in item_2]
-        print(accepted_pos_2)
         formatted_shape_2 = convert_shape_format(piece, 2)
         for pos_2 in formatted_shape_2:
             if pos_2 not in accepted_pos_2:
                 if pos_2[1] >= 0:
-                    return False
+                     return False
         return True
-
 
 # check if piece is out of board
 def check_lost(positions, num1):
@@ -295,7 +293,6 @@ def get_shape(grid):
         return Piece(4, 0, random.choice(shapes))
     elif piece_num == 2:
         return Piece(30, 0, random.choice(shapes))
-
 
 # draws text in the middle
 def draw_text_middle(text, size, color, surface):
@@ -330,23 +327,19 @@ def draw_grid(surface):
 def clear_rows(grid, locked, num):
     # need to check if row is clear then shift every other row above down one
     increment = 0
-    for i in range(len(grid) - 1, -1, -1):      # start checking the grid backwards
-        grid_row = grid[i]                      # get the last row
-        if (0, 0, 0) not in grid_row:           # if there are no empty spaces (i.e. black blocks)
-            increment += 1
-            # add positions to remove from locked
-            index = i                           # row index will be constant
-            for j in range(len(grid_row)):
-                try:
-                    del locked[(j, i)]          # delete every locked element in the bottom row
-                except ValueError:
-                    continue
-
-    # shift every row one step down
-    # delete filled bottom row
-    # add another empty row on the top
-    # move down one step
     if num == 1:
+        for i in range(len(grid) - 1, -1, -1):      # start checking the grid backwards
+            grid_row = grid[i]                      # get the last row
+            if (0, 0, 0) not in grid_row:           # if there are no empty spaces (i.e. black blocks)
+                increment += 1
+                # add positions to remove from locked
+                index = i                           # row index will be constant
+                for j in range(len(grid_row)):
+                    try:
+                        del locked[(j, i)]          # delete every locked element in the bottom row
+                    except ValueError:
+                        continue
+    # shift every row one step down, delete filled bottom row, add another empty row on the top, move down one step
         if increment > 0:
             pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
             # sort the locked list according to y value in (x,y) and then reverse
@@ -358,6 +351,17 @@ def clear_rows(grid, locked, num):
                     locked[new_key] = locked.pop(key)
         return increment
     elif num == 2:
+        for i in range(len(grid) - 1, -1, -1):      # start checking the grid backwards
+            grid_row = grid[i]                      # get the last row
+            if (0, 0, 0) not in grid_row:           # if there are no empty spaces (i.e. black blocks)
+                increment += 1
+                # add positions to remove from locked
+                index = i                           # row index will be constant
+                for j in range(len(grid_row)):
+                    try:
+                        del locked[(j, i)]          # delete every locked element in the bottom row
+                    except ValueError:
+                        continue
         if increment > 0:
             pygame.mixer.Channel(1).play(yay_sound) # NOTE PLAY THE SOUND HERE
             # sort the locked list according to y value in (x,y) and then reverse
@@ -372,24 +376,37 @@ def clear_rows(grid, locked, num):
 # draws the upcoming piece to the left of the screen 
 
 # NOTE FOR ANDY AND SAMANTHA - can delete the draw_next_shape and it will remove the 'next shape' feauture that is shown on the right of the screen, could be used to make more space for the split screen feature 
-def draw_next_shape(piece, surface):
-    font = pygame.font.Font(fontpath, 30) # set font 
-    label = font.render('Next shape', 1, (255, 255, 255))
-
-    start_x = top_left_x + play_width + 50
-    start_y = top_left_y + (play_height / 2 - 100)
-
-    shape_format = piece.shape[piece.rotation % len(piece.shape)] # note the piece.rotation uses the built in library function of pygame
-    
-    # Loop through the rows and columns of the shape format
-    for i, line in enumerate(shape_format):
-        row = list(line)
-        for j, column in enumerate(row):
-            if column == '0':
-                # the draw rect is used to draw rectangles
-                pygame.draw.rect(surface, piece.color, ((start_x) + j*block_size, start_y + i*block_size, block_size, block_size), 0)
-                # piece.color - random 
-    surface.blit(label, (start_x, start_y - 50))
+def draw_next_shape(piece, surface, pos):
+    if pos == 0:
+        font = pygame.font.Font(fontpath, 30) # set font 
+        label = font.render('Next shape', 1, (255, 255, 255))
+        start_x = top_left_x + play_width + 50
+        start_y = top_left_y + (play_height / 2 - 100)
+        shape_format = piece.shape[piece.rotation % len(piece.shape)] # note the piece.rotation uses the built in library function of pygame
+        # Loop through the rows and columns of the shape format
+        for i, line in enumerate(shape_format):
+            row = list(line)
+            for j, column in enumerate(row):
+                if column == '0':
+                    # the draw rect is used to draw rectangles
+                    pygame.draw.rect(surface, piece.color, ((start_x) + j*block_size, start_y + i*block_size, block_size, block_size), 0)
+                    # piece.color - random
+        surface.blit(label, (start_x, start_y - 50))
+    elif pos == 1:
+        font_2 = pygame.font.Font(fontpath, 30) # set font 
+        label_2 = font_2.render('Next shape', 1, (255, 255, 255))
+        start_x_2 = (top_left_x+600) + play_width + 50
+        start_y = top_left_y + (play_height / 2 - 100)
+        shape_format_2 = piece.shape[piece.rotation % len(piece.shape)] # note the piece.rotation uses the built in library function of pygame
+        # Loop through the rows and columns of the shape format
+        for i, line in enumerate(shape_format_2):
+            row_2 = list(line)
+            for j, column in enumerate(row_2):
+                if column == '0':
+                    # the draw rect is used to draw rectangles
+                    pygame.draw.rect(surface, piece.color, ((start_x_2) + j*block_size, start_y + i*block_size, block_size, block_size), 0)
+                    # piece.color - random 
+        surface.blit(label_2, (start_x_2, start_y - 50))
 
     # pygame.display.update()
 
@@ -615,7 +632,6 @@ def main(window):
             x_2, y_2 = piece_pos_2[i_2]
             if y_2 >= 0:
                 grid_2[y_2][x_2-20] = current_piece_2.color
-
                 
         if change_piece:  # if the piece is locked
             for pos in piece_pos:
@@ -656,9 +672,8 @@ def main(window):
                 #mixer.music.play(-1)
                 #last_score = score
         draw_window(window, grid_2, score, last_score)
-        draw_next_shape(next_piece_2, window)
+        draw_next_shape(next_piece_2, window, 1)
         
-
         pygame.display.update()
         if check_lost(locked_positions, 1):
             run = False
@@ -682,7 +697,7 @@ def main_menu(window):
                 run = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:
-                    pygame.display.quit()
+                    pygame.display.quit() 
                     quit()
                 else:
                     main(window)
